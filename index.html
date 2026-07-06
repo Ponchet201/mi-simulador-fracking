@@ -155,6 +155,11 @@
         @media (max-width: 600px) {
             .edu-grid { grid-template-columns: 1fr; }
         }
+
+        .value-display {
+            color: var(--primary);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -180,27 +185,27 @@
             </div>
 
             <div class="control-group">
-                <label>Profundidad del Pozo: <span id="valProfundidad">3000</span> metros</label>
+                <label>Profundidad del Pozo: <span id="valProfundidad" class="value-display">3000</span> metros</label>
                 <input type="range" id="profundidad" min="1000" max="5000" step="100" value="3000">
             </div>
 
             <div class="control-group">
-                <label>Longitud Horizontal: <span id="valLongitud">2000</span> metros</label>
+                <label>Longitud Horizontal: <span id="valLongitud" class="value-display">2000</span> metros</label>
                 <input type="range" id="longitud" min="500" max="3500" step="100" value="2000">
             </div>
 
             <div class="control-group">
-                <label>Volumen de Agua: <span id="valAgua">15</span> Millones de Litros</label>
+                <label>Volumen de Agua: <span id="valAgua" class="value-display">15</span> Millones de Litros</label>
                 <input type="range" id="agua" min="5" max="30" step="1" value="15">
             </div>
 
             <div class="control-group">
-                <label>Presión de Inyección: <span id="valPresion">10000</span> PSI</label>
+                <label>Presión de Inyección: <span id="valPresion" class="value-display">10000</span> PSI</label>
                 <input type="range" id="presion" min="5000" max="15000" step="500" value="10000">
             </div>
 
             <div class="control-group">
-                <label>Porcentaje de Aditivos Químicos: <span id="valAditivos">0.5</span>%</label>
+                <label>Porcentaje de Aditivos Químicos: <span id="valAditivos" class="value-display">0.5</span>%</label>
                 <input type="range" id="aditivos" min="0.1" max="2" step="0.1" value="0.5">
             </div>
 
@@ -249,6 +254,7 @@
                 <ul>
                     <li><strong>Independencia Energética:</strong> Permite extraer reservas que antes eran imposibles de alcanzar.</li>
                     <li><strong>Economía:</strong> Genera empleo local e ingresos masivos por regalías e impuestos.</li>
+                    <li><strong>Eficiencia:</strong> Optimiza la producción en poco espacio geográfico.</li>
                 </ul>
             </div>
             <div>
@@ -256,6 +262,7 @@
                 <ul>
                     <li><strong>Estrés Hídrico:</strong> Consume millones de litros de agua que quedan inutilizables.</li>
                     <li><strong>Sismicidad:</strong> La reinyección de aguas residuales a gran profundidad puede activar fallas geológicas.</li>
+                    <li><strong>Contaminación:</strong> Riesgo de contaminación en acuíferos y suelo.</li>
                 </ul>
             </div>
         </div>
@@ -263,24 +270,26 @@
 </div>
 
 <script>
-    // Conectar elementos de la interfaz gráfica con Javascript
+    // ============= CONEXIÓN DE SLIDERS CON VALORES =============
     const sliders = ['profundidad', 'longitud', 'agua', 'presion', 'aditivos'];
     sliders.forEach(id => {
         const input = document.getElementById(id);
         const output = document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1));
-        input.addEventListener('input', () => { output.innerText = input.value; });
+        input.addEventListener('input', () => { 
+            output.textContent = input.value; 
+        });
     });
 
+    // ============= CONFIGURACIÓN DEL CANVAS =============
     const canvas = document.getElementById('simCanvas');
     const ctx = canvas.getContext('2d');
     let animacionId;
 
-    // Lógica principal de simulación al pulsar el botón
+    // ============= LÓGICA PRINCIPAL DE SIMULACIÓN =============
     document.getElementById('btnSimular').addEventListener('click', () => {
-        // Detener animaciones previas si existen
         cancelAnimationFrame(animacionId);
 
-        // Obtener valores actuales de los controles
+        // Obtener valores actuales
         const roca = document.getElementById('tipoRoca').value;
         const prof = parseFloat(document.getElementById('profundidad').value);
         const lang = parseFloat(document.getElementById('longitud').value);
@@ -289,6 +298,133 @@
         const adit = parseFloat(document.getElementById('aditivos').value);
 
         // --- CÁLCULOS MATEMÁTICOS DE BALANCE ---
+        
+        // Factor según tipo de roca
         let factorRoca = roca === 'shale' ? 1.3 : (roca === 'arenisca' ? 0.9 : 1.0);
         
-Usa el código con precaución.// 1. Producción estimada (en barriles equivalentes de petróleo)const produccion = Math.round((lang * (pres / 1000) * factorRoca) * 12);document.getElementById('resProduccion').innerText = ${produccion.toLocaleString()} BOE;// 2. Costo del proyectoconst costo = ((prof * 1500) + (lang * 2200) + (agua * 50000)) / 1000000;document.getElementById('resCosto').innerText = $${costo.toFixed(2)} Millones USD;// 3. Rentabilidad (Semáforo)const rentabilidadVal = (produccion * 60) / (costo * 1000000);const bRent = document.getElementById('resRentabilidad');if (rentabilidadVal > 1.8) {bRent.innerText = "ALTA"; bRent.className = "badge badge-green";} else if (rentabilidadVal > 1.0) {bRent.innerText = "MEDIA"; bRent.className = "badge badge-yellow";} else {bRent.innerText = "VIABILIDAD BAJA"; bRent.className = "badge badge-red";}// 4. Riesgo Sísmicoconst bSismos = document.getElementById('resSismos');const riesgoSismo = (pres * 0.4) + (agua * 10);if (riesgoSismo > 5500) {bSismos.innerText = "ALTO RIESGO"; bSismos.className = "badge badge-red";} else if (riesgoSismo > 3500) {bSismos.innerText = "MODERADO"; bSismos.className = "badge badge-yellow";} else {bSismos.innerText = "BAJO"; bSismos.className = "badge badge-green";}// 5. Impacto Ambiental Generalconst bAmb = document.getElementById('resAmbiental');const impacto = (agua * 2) + (adit * 40) + (pres / 2000);if (impacto > 80) {bAmb.innerText = "CRÍTICO"; bAmb.className = "badge badge-red";} else if (impacto > 45) {bAmb.innerText = "PREOCUPANTE"; bAmb.className = "badge badge-yellow";} else {bAmb.innerText = "CONTROLADO"; bAmb.className = "badge badge-green";}// --- MOTOR DE ANIMACIÓN INTERACTIVA (CANVAS) ---let frame = 0;function animar() {ctx.clearRect(0, 0, canvas.width, canvas.height);frame++;// Dibujar capas de la corteza terrestrectx.fillStyle = '#64748b'; // Acuífero superficialctx.fillRect(0, 30, canvas.width, 15);ctx.fillStyle = '#475569'; // Capa intermedia de rocactx.fillRect(0, 45, canvas.width, 120);ctx.fillStyle = '#334155'; // Roca Madre objetivo (Shale)ctx.fillRect(0, 165, canvas.width, 50);// Etiquetas de texto en el escenarioctx.fillStyle = '#94a3b8';ctx.font = '10px sans-serif';ctx.fillText("💧 Acuífero Agua Dulce", 10, 25);ctx.fillText("🪨 Capas de Sello Geológico", 10, 80);ctx.fillText("🛢️ Yacimiento Objetivo", 10, 195);// 1. Dibujar Pozo Vertical (Progreso hasta frame 50)ctx.strokeStyle = '#e2e8f0';ctx.lineWidth = 4;ctx.beginPath();ctx.moveTo(200, 0);let yVert = Math.min(180, frame * 3.6);ctx.lineTo(200, yVert);ctx.stroke();// 2. Dibujar Pozo Horizontal (Progreso desde frame 50 a 100)let xHoriz = 200;if (frame > 50) {ctx.beginPath();ctx.moveTo(200, 180);xHoriz = Math.min(380, 200 + (frame - 50) * 3.6);ctx.lineTo(xHoriz, 180);ctx.stroke();}// 3. Simular Inyección del fluido (Fluido azul corriendo por dentro)if (frame > 100 && frame < 150) {ctx.strokeStyle = '#0284c7';ctx.lineWidth = 2;ctx.beginPath();ctx.moveTo(200, 0);ctx.lineTo(200, 180);ctx.lineTo(xHoriz, 180);ctx.stroke();}// 4. Detonar las Fracturas Hidráulicas (Destellos mecánicos)if (frame >= 150) {ctx.strokeStyle = varColorImpacto(impacto);ctx.lineWidth = 2;for (let i = 230; i < xHoriz; i += 30) {// Fractura superiorctx.beginPath();ctx.moveTo(i, 180);ctx.lineTo(i - 5, 155 + Math.sin(frame * 0.5) * 5);ctx.stroke();// Fractura inferiorctx.beginPath();ctx.moveTo(i, 180);ctx.lineTo(i + 5, 205 + Math.cos(frame * 0.5) * 5);ctx.stroke();}}// Loop de animación fluidoif (frame < 220) {animacionId = requestAnimationFrame(animar);} else {// Estado final: Flujo de hidrocarburo saliendo (puntos amarillos subiendo)ctx.fillStyle = '#eab308';ctx.font = 'bold 12px sans-serif';ctx.fillText("🟢 EXTRACCIÓN ACTIVA", 280, 25);}}// Auxiliar para definir color de fractura según el impacto calculadofunction varColorImpacto(imp) {if (imp > 80) return '#ef4444';if (imp > 45) return '#fbbf24';return '#22c55e';}animar();});// Cargar pantalla en blanco o por defecto al iniciar la primera vezwindow.onload = () => {ctx.fillStyle = '#334155';ctx.font = '14px sans-serif';ctx.fillText("Listo para simular. Ajusta valores y pulsa el botón.", 50, 120);};
+        // Producción estimada (barriles diarios)
+        let produccion = (lang * factorRoca * (pres / 10000) * (1 - adit/100)) * 50;
+        produccion = Math.max(100, Math.min(5000, produccion));
+        
+        // Costo operacional (millones USD)
+        let costo = (prof / 1000) * 2 + (lang / 1000) * 1.5 + (agua / 10) * 0.8;
+        costo = Math.round(costo * 10) / 10;
+        
+        // Ingresos potenciales (asumiendo $50 USD por barril)
+        let ingresos = (produccion * 50 * 365) / 1000000;
+        
+        // Rentabilidad (% anual)
+        let rentabilidad = ((ingresos - costo) / ingresos * 100);
+        
+        // Riesgo sísmico (0-10 escala)
+        let riesgoSismico = (agua * 0.15 + (prof / 500) * 0.4 + adit * 2);
+        riesgoSismico = Math.min(10, riesgoSismico);
+        
+        // Impacto ambiental (0-10 escala)
+        let impactoAmbiental = (agua * 0.2 + adit * 1.5 + (pres / 2000) * 0.5);
+        impactoAmbiental = Math.min(10, impactoAmbiental);
+
+        // --- ACTUALIZAR INTERFAZ CON RESULTADOS ---
+        
+        // Producción
+        document.getElementById('resProduccion').textContent = 
+            Math.round(produccion) + ' bbl/día';
+        
+        // Costo
+        document.getElementById('resCosto').textContent = 
+            '$' + costo + 'M USD';
+        
+        // Rentabilidad (badge con color)
+        let badgeRent = document.getElementById('resRentabilidad');
+        badgeRent.textContent = rentabilidad.toFixed(1) + '%';
+        badgeRent.className = 'badge ' + (rentabilidad > 50 ? 'badge-green' : 
+                                           rentabilidad > 20 ? 'badge-yellow' : 'badge-red');
+        
+        // Riesgo sísmico (badge con color)
+        let badgeSismo = document.getElementById('resSismos');
+        badgeSismo.textContent = riesgoSismico.toFixed(1) + '/10';
+        badgeSismo.className = 'badge ' + (riesgoSismico < 3 ? 'badge-green' : 
+                                            riesgoSismico < 6 ? 'badge-yellow' : 'badge-red');
+        
+        // Impacto ambiental (badge con color)
+        let badgeAmb = document.getElementById('resAmbiental');
+        badgeAmb.textContent = impactoAmbiental.toFixed(1) + '/10';
+        badgeAmb.className = 'badge ' + (impactoAmbiental < 3 ? 'badge-green' : 
+                                          impactoAmbiental < 6 ? 'badge-yellow' : 'badge-red');
+
+        // --- ANIMAR VISUALIZACIÓN EN CANVAS ---
+        animarSimulacion(produccion, costo, riesgoSismico, impactoAmbiental);
+    });
+
+    // ============= FUNCIÓN DE ANIMACIÓN EN CANVAS =============
+    function animarSimulacion(produccion, costo, riesgoSismico, impactoAmbiental) {
+        let progress = 0;
+        const duration = 1000;
+        const startTime = Date.now();
+
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            progress = Math.min(elapsed / duration, 1);
+
+            // Limpiar canvas
+            ctx.fillStyle = '#111827';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar ejes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, 30);
+            ctx.lineTo(40, 220);
+            ctx.lineTo(430, 220);
+            ctx.stroke();
+
+            // Texto de ejes
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '12px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('Producción', 50, 15);
+            ctx.fillText('Costo', 180, 15);
+            ctx.fillText('Riesgo', 280, 15);
+            ctx.fillText('Ambiente', 370, 15);
+
+            // Barra 1: Producción (escala 0-5000 bbl/día)
+            let altura1 = (progress * produccion / 5000) * 150;
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(50, 220 - altura1, 40, altura1);
+
+            // Barra 2: Costo (escala 0-20M USD)
+            let altura2 = (progress * Math.min(costo, 20) / 20) * 150;
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(150, 220 - altura2, 40, altura2);
+
+            // Barra 3: Riesgo Sísmico (escala 0-10)
+            let altura3 = (progress * riesgoSismico / 10) * 150;
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(250, 220 - altura3, 40, altura3);
+
+            // Barra 4: Impacto Ambiental (escala 0-10)
+            let altura4 = (progress * impactoAmbiental / 10) * 150;
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(350, 220 - altura4, 40, altura4);
+
+            // Etiquetas de valores
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 11px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.round(produccion * progress), 70, 235);
+            ctx.fillText((costo * progress).toFixed(1), 170, 235);
+            ctx.fillText((riesgoSismico * progress).toFixed(1), 270, 235);
+            ctx.fillText((impactoAmbiental * progress).toFixed(1), 370, 235);
+
+            if (progress < 1) {
+                animacionId = requestAnimationFrame(animate);
+            }
+        }
+
+        animate();
+    }
+</script>
+
+</body>
+</html>
