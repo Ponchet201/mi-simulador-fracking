@@ -1,0 +1,437 @@
+¡Entendido perfectamente! Vamos a hacer un simulador sencillo, interactivo y en un solo archivo. No necesitas descargar tres cosas separadas; todo (HTML, diseño CSS y la lógica de juego en JavaScript) estará metido en un único archivo.
+Para "jugar", solo tendrás que guardarlo en tu computadora y hacerle doble clic.
+## ¿Cómo jugarlo en tu PC?
+
+   1. Copia todo el código de abajo.
+   2. Abre el Bloc de notas (o cualquier editor de texto).
+   3. Pega el código y guarda el archivo con el nombre simulador.html (asegúrate de que termine en .html y no en .txt).
+   4. Haz doble clic sobre el archivo guardado y se abrirá en tu navegador para empezar a jugar.
+
+Aquí tienes el código completo, limpio y fácil de usar:
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Simulador de Fracking Universitario</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --primary: #38bdf8;
+            --accent: #fbbf24;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--card-bg);
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .control-group input[type="range"], .control-group select {
+            width: 100%;
+            padding: 8px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.01);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .result-item:last-child { border: none; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .badge-green { background-color: var(--success); color: #0f172a; }
+        .badge-yellow { background-color: var(--accent); color: #0f172a; }
+        .badge-red { background-color: var(--danger); color: white; }
+
+        /* Estilos del área de animación */
+        #canvas-container {
+            text-align: center;
+            margin-top: 15px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background-color: #111827;
+            margin: 0 auto;
+        }
+
+        .edu-section {
+            margin-top: 30px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .edu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .edu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulador Interactivo de Fracking</h1>
+        <p>Ajusta las variables de ingeniería y evalúa el impacto técnico, económico y ambiental.</p>
+    </header>
+
+    <div class="grid-layout">
+        <!-- PANEL DE CONTROLES -->
+        <div class="card">
+            <h2>⚙️ Parámetros de Operación</h2>
+            
+            <div class="control-group">
+                <label>Tipo de Formación Geológica:</label>
+                <select id="tipoRoca">
+                    <option value="shale">Shale (Lutita - Alta productividad / Difícil)</option>
+                    <option value="arenisca">Arenisca Compacta (Fácil fractura)</option>
+                    <option value="caliza">Caliza (Productividad moderada)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Profundidad del Pozo: <span id="valProfundidad">3000</span> metros</label>
+                <input type="range" id="profundidad" min="1000" max="5000" step="100" value="3000">
+            </div>
+
+            <div class="control-group">
+                <label>Longitud Horizontal: <span id="valLongitud">2000</span> metros</label>
+                <input type="range" id="longitud" min="500" max="3500" step="100" value="2000">
+            </div>
+
+            <div class="control-group">
+                <label>Volumen de Agua: <span id="valAgua">15</span> Millones de Litros</label>
+                <input type="range" id="agua" min="5" max="30" step="1" value="15">
+            </div>
+
+            <div class="control-group">
+                <label>Presión de Inyección: <span id="valPresion">10000</span> PSI</label>
+                <input type="range" id="presion" min="5000" max="15000" step="500" value="10000">
+            </div>
+
+            <div class="control-group">
+                <label>Porcentaje de Aditivos Químicos: <span id="valAditivos">0.5</span>%</label>
+                <input type="range" id="aditivos" min="0.1" max="2" step="0.1" value="0.5">
+            </div>
+
+            <button class="btn" id="btnSimular">⚡ INICIAR SIMULACIÓN</button>
+        </div>
+
+        <!-- PANEL DE RESULTADOS Y ANIMACIÓN -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h2>📊 Resultados del Diagnóstico</h2>
+                <div class="result-item">
+                    <span>Producción Estimada:</span>
+                    <strong id="resProduccion">-</strong>
+                </div>
+                <div class="result-item">
+                    <span>Costo Económico:</span>
+                    <strong id="resCosto">-</strong>
+                </div>
+                <div class="result-item">
+                    <span>Rentabilidad Comercial:</span>
+                    <span id="resRentabilidad" class="badge">-</span>
+                </div>
+                <div class="result-item">
+                    <span>Riesgo Sísmico Inducido:</span>
+                    <span id="resSismos" class="badge">-</span>
+                </div>
+                <div class="result-item">
+                    <span>Impacto Ambiental General:</span>
+                    <span id="resAmbiental" class="badge">-</span>
+                </div>
+            </div>
+
+            <!-- Gráfico Animado -->
+            <div id="canvas-container">
+                <canvas id="simCanvas" width="450" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN EDUCATIVA ADICIONAL -->
+    <div class="edu-section">
+        <h2>📚 Guía Rápida de Aprendizaje</h2>
+        <div class="edu-grid">
+            <div>
+                <h3>Ventajas Principales</h3>
+                <ul>
+                    <li><strong>Independencia Energética:</strong> Permite extraer reservas que antes eran imposibles de alcanzar.</li>
+                    <li><strong>Economía:</strong> Genera empleo local e ingresos masivos por regalías e impuestos.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Desventajas y Desafíos</h3>
+                <ul>
+                    <li><strong>Estrés Hídrico:</strong> Consume millones de litros de agua que quedan inutilizables.</li>
+                    <li><strong>Sismicidad:</strong> La reinyección de aguas residuales a gran profundidad puede activar fallas geológicas.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Conectar elementos de la interfaz gráfica con Javascript
+    const sliders = ['profundidad', 'longitud', 'agua', 'presion', 'aditivos'];
+    sliders.forEach(id => {
+        const input = document.getElementById(id);
+        const output = document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1));
+        input.addEventListener('input', () => { output.innerText = input.value; });
+    });
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    let animacionId;
+
+    // Lógica principal de simulación al pulsar el botón
+    document.getElementById('btnSimular').addEventListener('click', () => {
+        // Detener animaciones previas si existen
+        cancelAnimationFrame(animacionId);
+
+        // Obtener valores actuales de los controles
+        const roca = document.getElementById('tipoRoca').value;
+        const prof = parseFloat(document.getElementById('profundidad').value);
+        const lang = parseFloat(document.getElementById('longitud').value);
+        const agua = parseFloat(document.getElementById('agua').value);
+        const pres = parseFloat(document.getElementById('presion').value);
+        const adit = parseFloat(document.getElementById('aditivos').value);
+
+        // --- CÁLCULOS MATEMÁTICOS DE BALANCE ---
+        let factorRoca = roca === 'shale' ? 1.3 : (roca === 'arenisca' ? 0.9 : 1.0);
+        
+
+// 1. Producción estimada (en barriles equivalentes de petróleo)
+const produccion = Math.round((lang * (pres / 1000) * factorRoca) * 12);
+document.getElementById('resProduccion').innerText = ${produccion.toLocaleString()} BOE;
+// 2. Costo del proyecto
+const costo = ((prof * 1500) + (lang * 2200) + (agua * 50000)) / 1000000;
+document.getElementById('resCosto').innerText = $${costo.toFixed(2)} Millones USD;
+// 3. Rentabilidad (Semáforo)
+const rentabilidadVal = (produccion * 60) / (costo * 1000000);
+const bRent = document.getElementById('resRentabilidad');
+if (rentabilidadVal > 1.8) {
+bRent.innerText = "ALTA"; bRent.className = "badge badge-green";
+} else if (rentabilidadVal > 1.0) {
+bRent.innerText = "MEDIA"; bRent.className = "badge badge-yellow";
+} else {
+bRent.innerText = "VIABILIDAD BAJA"; bRent.className = "badge badge-red";
+}
+// 4. Riesgo Sísmico
+const bSismos = document.getElementById('resSismos');
+const riesgoSismo = (pres * 0.4) + (agua * 10);
+if (riesgoSismo > 5500) {
+bSismos.innerText = "ALTO RIESGO"; bSismos.className = "badge badge-red";
+} else if (riesgoSismo > 3500) {
+bSismos.innerText = "MODERADO"; bSismos.className = "badge badge-yellow";
+} else {
+bSismos.innerText = "BAJO"; bSismos.className = "badge badge-green";
+}
+// 5. Impacto Ambiental General
+const bAmb = document.getElementById('resAmbiental');
+const impacto = (agua * 2) + (adit * 40) + (pres / 2000);
+if (impacto > 80) {
+bAmb.innerText = "CRÍTICO"; bAmb.className = "badge badge-red";
+} else if (impacto > 45) {
+bAmb.innerText = "PREOCUPANTE"; bAmb.className = "badge badge-yellow";
+} else {
+bAmb.innerText = "CONTROLADO"; bAmb.className = "badge badge-green";
+}
+// --- MOTOR DE ANIMACIÓN INTERACTIVA (CANVAS) ---
+let frame = 0;
+function animar() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+frame++;
+// Dibujar capas de la corteza terrestre
+ctx.fillStyle = '#64748b'; // Acuífero superficial
+ctx.fillRect(0, 30, canvas.width, 15);
+ctx.fillStyle = '#475569'; // Capa intermedia de roca
+ctx.fillRect(0, 45, canvas.width, 120);
+ctx.fillStyle = '#334155'; // Roca Madre objetivo (Shale)
+ctx.fillRect(0, 165, canvas.width, 50);
+// Etiquetas de texto en el escenario
+ctx.fillStyle = '#94a3b8';
+ctx.font = '10px sans-serif';
+ctx.fillText("💧 Acuífero Agua Dulce", 10, 25);
+ctx.fillText("🪨 Capas de Sello Geológico", 10, 80);
+ctx.fillText("🛢️ Yacimiento Objetivo", 10, 195);
+// 1. Dibujar Pozo Vertical (Progreso hasta frame 50)
+ctx.strokeStyle = '#e2e8f0';
+ctx.lineWidth = 4;
+ctx.beginPath();
+ctx.moveTo(200, 0);
+let yVert = Math.min(180, frame * 3.6);
+ctx.lineTo(200, yVert);
+ctx.stroke();
+// 2. Dibujar Pozo Horizontal (Progreso desde frame 50 a 100)
+let xHoriz = 200;
+if (frame > 50) {
+ctx.beginPath();
+ctx.moveTo(200, 180);
+xHoriz = Math.min(380, 200 + (frame - 50) * 3.6);
+ctx.lineTo(xHoriz, 180);
+ctx.stroke();
+}
+// 3. Simular Inyección del fluido (Fluido azul corriendo por dentro)
+if (frame > 100 && frame < 150) {
+ctx.strokeStyle = '#0284c7';
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(200, 0);
+ctx.lineTo(200, 180);
+ctx.lineTo(xHoriz, 180);
+ctx.stroke();
+}
+// 4. Detonar las Fracturas Hidráulicas (Destellos mecánicos)
+if (frame >= 150) {
+ctx.strokeStyle = varColorImpacto(impacto);
+ctx.lineWidth = 2;
+for (let i = 230; i < xHoriz; i += 30) {
+// Fractura superior
+ctx.beginPath();
+ctx.moveTo(i, 180);
+ctx.lineTo(i - 5, 155 + Math.sin(frame * 0.5) * 5);
+ctx.stroke();
+// Fractura inferior
+ctx.beginPath();
+ctx.moveTo(i, 180);
+ctx.lineTo(i + 5, 205 + Math.cos(frame * 0.5) * 5);
+ctx.stroke();
+}
+}
+// Loop de animación fluido
+if (frame < 220) {
+animacionId = requestAnimationFrame(animar);
+} else {
+// Estado final: Flujo de hidrocarburo saliendo (puntos amarillos subiendo)
+ctx.fillStyle = '#eab308';
+ctx.font = 'bold 12px sans-serif';
+ctx.fillText("🟢 EXTRACCIÓN ACTIVA", 280, 25);
+}
+}
+// Auxiliar para definir color de fractura según el impacto calculado
+function varColorImpacto(imp) {
+if (imp > 80) return '#ef4444';
+if (imp > 45) return '#fbbf24';
+return '#22c55e';
+}
+animar();
+});
+// Cargar pantalla en blanco o por defecto al iniciar la primera vez
+window.onload = () => {
+ctx.fillStyle = '#334155';
+ctx.font = '14px sans-serif';
+ctx.fillText("Listo para simular. Ajusta valores y pulsa el botón.", 50, 120);
+};
+
+
+### Características de esta versión portátil:
+* **Fórmulas dinámicas:** Al presionar el botón, calcula los valores cruzando variables reales como el tipo de suelo y la presión.
+* **Canvas fluido:** Incluye un gráfico animado interactivo que dibuja la perforación por pasos y rompe la roca al final.
+* **Educativo y directo:** Al final del juego, enseña las ventajas y desventajas resumidas que exigen los planes de estudio.
+
+Si quieres agregarle algún campo extra o cambiar alguna métrica de coste, me avisas y lo modificamos al instante. Proponme **qué variable adicional** te gustaría simular para avanzar en tus pruebas.
+
+
